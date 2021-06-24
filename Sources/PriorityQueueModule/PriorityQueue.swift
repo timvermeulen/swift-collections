@@ -146,6 +146,7 @@ public struct PriorityQueue<Element: Comparable> {
 
   // MARK: -
 
+  @inline(__always)
   @inlinable
   internal mutating func _bubbleUp(startingAt index: Int) {
     guard let parentIdx = _parentIndex(of: index) else {
@@ -173,23 +174,27 @@ public struct PriorityQueue<Element: Comparable> {
     }
   }
 
+  @inline(__always)
   @inlinable
   internal mutating func _bubbleUpMin(startingAt index: Int) {
-    guard let grandparentIdx = _grandparentIndex(of: index) else { return }
-
-    if storage[index] < storage[grandparentIdx] {
+    var index = index
+      
+    while let grandparentIdx = _grandparentIndex(of: index),
+          storage[index] < storage[grandparentIdx] {
       _swapAt(index, grandparentIdx)
-      _bubbleUpMin(startingAt: grandparentIdx)
+      index = grandparentIdx
     }
   }
 
+  @inline(__always)
   @inlinable
   internal mutating func _bubbleUpMax(startingAt index: Int) {
-    guard let grandparentIdx = _grandparentIndex(of: index) else { return }
-
-    if storage[index] > storage[grandparentIdx] {
+    var index = index
+      
+    while let grandparentIdx = _grandparentIndex(of: index),
+          storage[index] > storage[grandparentIdx] {
       _swapAt(index, grandparentIdx)
-      _bubbleUpMax(startingAt: grandparentIdx)
+      index = grandparentIdx
     }
   }
 
@@ -214,6 +219,7 @@ public struct PriorityQueue<Element: Comparable> {
 
   // MARK: -
 
+  @inline(__always)
   @inlinable
   internal mutating func _trickleDown(startingAt index: Int) {
     // Figure out if `index` is on an even or odd level
@@ -225,63 +231,58 @@ public struct PriorityQueue<Element: Comparable> {
       _trickleDownMax(startingAt: index)
     }
   }
-
+ 
+  @inline(__always)
   @inlinable
   internal mutating func _trickleDownMin(startingAt index: Int) {
-    guard let (smallestDescendantIdx, isChild) =
-            _indexOfLowestPriorityChildOrGrandchild(of: index)
-    else {
-      // We have no descendants -- no need to trickle down further
-      return
-    }
+    var index = index
 
-    if isChild {
-      if storage[smallestDescendantIdx] < storage[index] {
-        _swapAt(smallestDescendantIdx, index)
-      }
-    } else {
-      // Smallest is a grandchild
+    while let (smallestDescendantIdx, isChild) =
+          _indexOfLowestPriorityChildOrGrandchild(of: index) {
+
       if storage[smallestDescendantIdx] < storage[index] {
         _swapAt(smallestDescendantIdx, index)
 
+        if isChild {
+          return
+        }
+          
+        // Smallest is a grandchild
         let parentIdx = _parentIndex(of: smallestDescendantIdx)!
         if storage[smallestDescendantIdx] > storage[parentIdx] {
           _swapAt(smallestDescendantIdx, parentIdx)
         }
 
-        _trickleDownMin(startingAt: smallestDescendantIdx)
-      }
+        index = smallestDescendantIdx
+      } else { return }
     }
   }
 
+  @inline(__always)
   @inlinable
   internal mutating func _trickleDownMax(startingAt index: Int) {
-    guard let (largestDescendantIdx, isChild) =
-            _indexOfHighestPriorityChildOrGrandchild(of: index)
-    else {
-      // We have no descendants -- no need to trickle down further
-      return
-    }
+    var index = index
+      
+    while let (largestDescendantIdx, isChild) =
+          _indexOfHighestPriorityChildOrGrandchild(of: index) {
 
-    if isChild {
       if storage[largestDescendantIdx] > storage[index] {
         _swapAt(largestDescendantIdx, index)
-      }
-    } else {
-      // Largest is a grandchild
-      if storage[largestDescendantIdx] > storage[index] {
-        _swapAt(largestDescendantIdx, index)
+        
+        if isChild {
+          return
+        }
 
+        // Largest is a grandchild
         let parentIdx = _parentIndex(of: largestDescendantIdx)!
         if storage[largestDescendantIdx] < storage[parentIdx] {
           _swapAt(largestDescendantIdx, parentIdx)
         }
 
-        _trickleDownMax(startingAt: largestDescendantIdx)
-      }
+        index = largestDescendantIdx
+      } else { return }
     }
   }
-
   /// Returns the lowest priority child or grandchild of the element at the
   /// given index.
   ///
@@ -289,6 +290,7 @@ public struct PriorityQueue<Element: Comparable> {
   ///
   /// - parameter index: The index of the element whose descendants should be
   ///                    compared.
+  @inline(__always)
   @inlinable
   internal func _indexOfLowestPriorityChildOrGrandchild(
     of index: Int
@@ -342,6 +344,7 @@ public struct PriorityQueue<Element: Comparable> {
   ///
   /// - parameter index: The index of the item whose descendants should be
   ///                    compared.
+  @inline(__always)
   @inlinable
   internal func _indexOfHighestPriorityChildOrGrandchild(
     of index: Int
