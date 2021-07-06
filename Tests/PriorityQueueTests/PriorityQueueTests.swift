@@ -271,6 +271,64 @@ final class PriorityQueueTests: XCTestCase {
     XCTAssertEqual(queue.removeMax(), 2)
     XCTAssertEqual(queue.removeMax(), 1)
   }
+  
+  func test_replaceMin() {
+    var queue: PriorityQueue = [1, 2, 3, 4, 5]
+    
+    XCTAssertEqual(queue.replaceMin(with: 10), 1) // [2, 3, 4, 5, 10]
+    XCTAssertEqual(queue.min(), 2)
+    XCTAssertEqual(queue.max(), 10)
+    XCTAssertEqual(queue.count, 5)
+    
+    XCTAssertEqual(queue.replaceMin(with: -10), 2) // [-10, 3, 4, 5, 10]
+    XCTAssertEqual(queue.min(), -10)
+    XCTAssertEqual(queue.max(), 10)
+    XCTAssertEqual(queue.count, 5)
+    
+    XCTAssertEqual(queue.replaceMin(with: 20), -10) // [3, 4, 5, 10, 20]
+    XCTAssertEqual(queue.min(), 3)
+    XCTAssertEqual(queue.max(), 20)
+    XCTAssertEqual(queue.count, 5)
+    
+    XCTAssertEqual(queue.replaceMin(with: 3), 3) // [3, 4, 5, 10, 20]
+    XCTAssertEqual(queue.min(), 3)
+    XCTAssertEqual(queue.max(), 20)
+    XCTAssertEqual(queue.count, 5)
+    
+    XCTAssertEqual(queue.replaceMin(with: 30), 3) // [4, 5, 10, 20, 30]
+    XCTAssertEqual(queue.min(), 4)
+    XCTAssertEqual(queue.max(), 30)
+    XCTAssertEqual(queue.count, 5)
+  }
+  
+  func test_replaceMax() {
+    var queue: PriorityQueue = [1, 2, 3, 4, 5]
+    
+    XCTAssertEqual(queue.replaceMax(with: 10), 5) // [1, 2, 3, 4, 10]
+    XCTAssertEqual(queue.min(), 1)
+    XCTAssertEqual(queue.max(), 10)
+    XCTAssertEqual(queue.count, 5)
+    
+    XCTAssertEqual(queue.replaceMax(with: -10), 10) // [-10, 1, 2, 3, 4]
+    XCTAssertEqual(queue.min(), -10)
+    XCTAssertEqual(queue.max(), 4)
+    XCTAssertEqual(queue.count, 5)
+    
+    XCTAssertEqual(queue.replaceMax(with: 20), 4) // [-10, 1, 2, 3, 20]
+    XCTAssertEqual(queue.min(), -10)
+    XCTAssertEqual(queue.max(), 20)
+    XCTAssertEqual(queue.count, 5)
+    
+    XCTAssertEqual(queue.replaceMax(with: 20), 20) // [-10, 1, 2, 3, 20]
+    XCTAssertEqual(queue.min(), -10)
+    XCTAssertEqual(queue.max(), 20)
+    XCTAssertEqual(queue.count, 5)
+    
+    XCTAssertEqual(queue.replaceMax(with: -20), 20) // [-20, -10, 1, 2, 3]
+    XCTAssertEqual(queue.min(), -20)
+    XCTAssertEqual(queue.max(), 3)
+    XCTAssertEqual(queue.count, 5)
+  }
 
   // MARK: -
 

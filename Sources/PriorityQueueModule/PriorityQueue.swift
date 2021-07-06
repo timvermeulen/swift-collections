@@ -151,6 +151,53 @@ public struct PriorityQueue<Element: Comparable> {
 
     return popMax()!
   }
+  
+  /// Returns the element with the lowest priority and replaces it with the
+  /// given element.
+  ///
+  /// The queue *must not* be empty.
+  ///
+  /// - Complexity: O(log `count`)
+  @inlinable
+  @discardableResult
+  public mutating func replaceMin(with element: Element) -> Element {
+    precondition(!isEmpty)
+    
+    var result = element
+    swap(&result, &storage[0])
+    _trickleDownMin(startingAt: 0)
+    _checkInvariants()
+    
+    return result
+  }
+  
+  /// Returns the element with the highest priority and replaces it with the
+  /// given element.
+  ///
+  /// The queue *must not* be empty.
+  ///
+  /// - Complexity: O(log `count`)
+  @inlinable
+  @discardableResult
+  public mutating func replaceMax(with element: Element) -> Element {
+    precondition(!isEmpty)
+    
+    let indexOfMaxElement = storage.count <= 2
+      ? storage.count - 1
+      : storage[2] > storage[1] ? 2 : 1
+    
+    var result = element
+    swap(&result, &storage[indexOfMaxElement])
+    
+    if storage[indexOfMaxElement] < storage[0] {
+      _swapAt(0, indexOfMaxElement)
+    }
+    
+    _trickleDown(startingAt: indexOfMaxElement)
+    _checkInvariants()
+    
+    return result
+  }
 
   // MARK: -
 
